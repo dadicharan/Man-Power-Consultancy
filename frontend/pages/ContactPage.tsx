@@ -92,7 +92,7 @@ export const ContactPage: React.FC = () => {
                   <div>
                     <h4 className="font-bold text-slate-900">Registered Office</h4>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      Gajuwaka, Visakhapatnam, Andhra Pradesh - 530026, India
+                      Visakhapatnam, Andhra Pradesh - 530026, India
                     </p>
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export const ContactPage: React.FC = () => {
                   <div>
                     <h4 className="font-bold text-slate-900">Phone Lines</h4>
                     <p className="text-xs text-slate-600 mt-1">
-                      <a href="tel:+916309116432" className="hover:text-[#FF6B00] font-medium">+91 6309116432</a> (Direct & Candidate Desk)
+                      <a href="tel:+919182736423" className="hover:text-[#FF6B00] font-medium">+91 9182736423</a> (Direct & Candidate Desk)
                     </p>
                   </div>
                 </div>

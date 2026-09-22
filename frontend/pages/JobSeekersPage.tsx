@@ -83,6 +83,21 @@ export const JobSeekersPage: React.FC = () => {
         </div>
       </section>
 
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { value: '5,000+', label: 'Candidates placed', tone: 'bg-[#FFF5EE]' },
+            { value: '14 days', label: 'Average hiring cycle', tone: 'bg-[#F3F8FF]' },
+            { value: '500+', label: 'Corporate partners', tone: 'bg-[#F5FFF7]' }
+          ].map((item) => (
+            <div key={item.label} className={`rounded-2xl border border-slate-200 p-4 ${item.tone}`}>
+              <div className="text-2xl font-extrabold text-slate-900">{item.value}</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600 mt-1">{item.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* =========================================================================
           CANDIDATE TRUST & SAFETY ADVISORY: BEWARE OF FAKE JOBS
           ========================================================================= */}

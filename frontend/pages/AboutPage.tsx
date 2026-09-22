@@ -53,7 +53,7 @@ export const AboutPage: React.FC = () => {
 
   const leadership = [
     {
-      name: 'Mohana Dadi',
+      name: 'Ananya Rao',
       role: 'Managing Director & Founder',
       bio: 'Over 15 years in strategic manpower recruitment and workforce planning across India and the GCC region.',
       image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
@@ -216,7 +216,7 @@ export const AboutPage: React.FC = () => {
           <div className="text-2xl sm:text-3xl font-extrabold tracking-widest text-white uppercase flex items-center justify-center gap-3">
             <span>People</span>
             <span className="text-[#FF6B00]">•</span>
-            <span>Process</span>
+            <span className="text-[#FF6B00]">Process</span>
             <span className="text-[#FF6B00]">•</span>
             <span>Progress</span>
           </div>

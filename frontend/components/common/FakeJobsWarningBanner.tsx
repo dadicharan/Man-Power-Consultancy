@@ -116,8 +116,8 @@ export const FakeJobsWarningBanner: React.FC<FakeJobsWarningBannerProps> = ({ co
               </p>
             </div>
             <div className="mt-2 pt-1 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-800">
-              <a href="tel:+916309116432" className="text-amber-800 hover:underline flex items-center gap-1">
-                <PhoneCall className="w-3 h-3 text-amber-700" /> +91 6309116432
+              <a href="tel:+919182736423" className="text-amber-800 hover:underline flex items-center gap-1">
+                <PhoneCall className="w-3 h-3 text-amber-700" /> +91 9182736423
               </a>
               <a href="mailto:info@workforce.com" className="text-amber-800 hover:underline flex items-center gap-1">
                 <Mail className="w-3 h-3 text-amber-700" /> info@workforce.com

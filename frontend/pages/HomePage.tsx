@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Briefcase, 
@@ -32,11 +32,39 @@ export const HomePage: React.FC = () => {
   const featuredJobs = jobs.filter(j => j.status === 'Published').slice(0, 6);
 
   const stats = [
-    { value: '10+', label: 'Years of Experience', icon: Clock, desc: 'Proven recruitment heritage' },
-    { value: '500+', label: 'Happy Clients', icon: Building2, desc: 'Enterprises & startups' },
-    { value: '5,000+', label: 'Candidates Placed', icon: Users, desc: 'Across top global sectors' },
-    { value: '98%', label: 'Success Rate', icon: Award, desc: 'Client satisfaction score' }
+    { target: 10, suffix: '+', label: 'Years of Experience', icon: Clock, desc: 'Proven recruitment heritage' },
+    { target: 500, suffix: '+', label: 'Happy Clients', icon: Building2, desc: 'Enterprises & startups' },
+    { target: 5000, suffix: '+', label: 'Candidates Placed', icon: Users, desc: 'Across top global sectors' },
+    { target: 98, suffix: '%', label: 'Success Rate', icon: Award, desc: 'Client satisfaction score' }
   ];
+  const statsSectionRef = useRef<HTMLElement>(null);
+  const hasAnimatedStats = useRef(false);
+  const [animatedStats, setAnimatedStats] = useState(() => stats.map(() => 0));
+
+  useEffect(() => {
+    const statsSection = statsSectionRef.current;
+    if (!statsSection) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || hasAnimatedStats.current) return;
+      hasAnimatedStats.current = true;
+      const startTime = performance.now();
+      const duration = 650;
+
+      const animateStats = (currentTime: number) => {
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        setAnimatedStats(stats.map((stat) => Math.round(stat.target * easedProgress)));
+        if (progress < 1) requestAnimationFrame(animateStats);
+      };
+
+      requestAnimationFrame(animateStats);
+      observer.disconnect();
+    }, { threshold: 0.25 });
+
+    observer.observe(statsSection);
+    return () => observer.disconnect();
+  }, []);
 
   const whyChooseUs = [
     {
@@ -82,6 +110,7 @@ export const HomePage: React.FC = () => {
         
         {/* Background Visual: Only the manpower workforce image directly in the background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/55 to-slate-900/20" />
           <img 
             src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=2070&q=85" 
             alt="Workforce and Manpower Staffing Team"
@@ -94,13 +123,13 @@ export const HomePage: React.FC = () => {
           <div className="max-w-2xl text-center lg:text-left flex flex-col items-center lg:items-start">
             
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-black tracking-tight leading-[1.15] sm:leading-[1.1] text-center lg:text-left">
-              Build Your Team.<br />
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] sm:leading-[1.1] text-center lg:text-left">
+              Build Your <span className="text-[#FF6B00]">Team</span>.<br />
               Build Your <span className="text-[#FF6B00]">Success</span>.
             </h1>
 
             {/* Subtitle */}
-            <p className="mt-5 text-base sm:text-lg text-black leading-relaxed max-w-xl font-medium text-center lg:text-left mx-auto lg:mx-0">
+            <p className="mt-5 text-base sm:text-lg text-white leading-relaxed max-w-xl font-medium text-center lg:text-left mx-auto lg:mx-0">
               We provide skilled, reliable and professional workforce solutions for businesses of all sizes. Fast-track your hiring or discover your next career milestone.
             </p>
 
@@ -124,14 +153,14 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Quick trust metrics (Centered on mobile/tablet, Left on desktop) */}
-            <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs text-black font-semibold w-full">
+            <div className="mt-10 pt-6 border-t border-white/40 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs text-white font-semibold w-full">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                <span className="text-black">Verified Pre-screened Talent</span>
+                <span className="text-white">Verified Pre-screened Talent</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                <span className="text-black">90-Day Placement Guarantee</span>
+                <span className="text-white">90-Day Placement Guarantee</span>
               </div>
             </div>
 
@@ -142,7 +171,7 @@ export const HomePage: React.FC = () => {
       {/* =========================================================================
           2. TRUST / STATISTICS ROW (Matches Screen 1 4-card statistics row)
           ========================================================================= */}
-      <section className="relative -mt-8 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section ref={statsSectionRef} className="relative -mt-8 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
@@ -155,7 +184,7 @@ export const HomePage: React.FC = () => {
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {stat.value}
+                  {animatedStats[idx].toLocaleString()}{stat.suffix}
                 </div>
                 <div className="text-xs sm:text-sm font-bold text-slate-700 mt-1">
                   {stat.label}

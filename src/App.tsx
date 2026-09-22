@@ -50,6 +50,7 @@ function MainLayout() {
           <Route path="/candidates/register" element={<CandidateRegistrationPage />} />
           <Route path="/candidate/portal" element={<CandidatePortalPage />} />
           <Route path="/employers" element={<EmployersPage />} />
+          <Route path="/employer/portal" element={<EmployersPage />} />
           <Route path="/employer/enquiry" element={<EmployerEnquiryPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/services/:slug" element={<ServiceDetailPage />} />
