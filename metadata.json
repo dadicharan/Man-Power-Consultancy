@@ -1,0 +1,6 @@
+{
+  "name": "WorkForce Manpower Consultancy",
+  "description": "Comprehensive manpower recruitment and staffing solutions platform with job board, candidate portal, employer management, and interactive ATS admin panel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
