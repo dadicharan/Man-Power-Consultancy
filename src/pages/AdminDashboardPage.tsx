@@ -259,24 +259,6 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Quick Excel Export All */}
-            <button
-              onClick={() => {
-                import('../lib/excelExport').then(m => {
-                  m.exportJobsToExcel(jobs);
-                  m.exportCandidatesToExcel(candidates);
-                  m.exportApplicationsToExcel(applications);
-                  m.exportEnquiriesToExcel(enquiries);
-                });
-                showToast('All system records exported to Excel sheets (.xlsx)!', 'success');
-              }}
-              title="Download all tables into Excel (.xlsx)"
-              className="px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow flex items-center gap-1.5 transition-all"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export Excel</span>
-            </button>
-
             <button
               onClick={() => setIsNewJobModalOpen(true)}
               id="admin-post-job-top-btn"

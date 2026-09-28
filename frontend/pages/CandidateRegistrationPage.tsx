@@ -213,38 +213,6 @@ export const CandidateRegistrationPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const candObj = {
-                      id: registeredCandId,
-                      fullName,
-                      email,
-                      phone,
-                      dob,
-                      gender,
-                      currentLocation,
-                      highestQualification,
-                      currentJobTitle,
-                      totalExperience,
-                      skills: skills.split(',').map(s => s.trim()).filter(Boolean),
-                      expectedSalary,
-                      resumeFileName: resumeFileName || 'Candidate_Resume.pdf',
-                      status: 'Registered' as const,
-                      registeredDate: new Date().toLocaleDateString('en-GB'),
-                      profileCompletion: 85
-                    };
-                    import('../lib/excelExport').then(m => m.exportCandidateToExcel(candObj));
-                    showToast('Candidate record exported to Excel (.xlsx)!', 'success');
-                  }}
-                  className="px-4 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow flex items-center gap-1.5"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Download Excel Copy (.xlsx)</span>
-                </button>
-              </div>
-
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/candidate/portal"

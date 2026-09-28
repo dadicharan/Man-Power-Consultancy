@@ -35,13 +35,6 @@ import {
   initiateGoogleSignIn,
   isSupabaseConfigured
 } from '../lib/supabase';
-import { 
-  exportApplicationToExcel, 
-  exportCandidateToExcel, 
-  exportEnquiryToExcel, 
-  exportContactToExcel, 
-  exportJobToExcel 
-} from '../lib/excelExport';
 
 export type AuthModalTab = 'user_login' | 'user_register' | 'admin_login';
 
@@ -656,10 +649,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. SAVE TO SUPABASE DATABASE
     saveCandidateToSupabase(newCand);
 
-    // 2. SAVE & AUTO-DOWNLOAD EXCEL (.xlsx) SPREADSHEET
-    exportCandidateToExcel(newCand);
-
-    showToast(`Profile registered, saved to Supabase & exported to Excel (.xlsx)!`, 'success');
+    showToast('Profile registered and saved to Supabase successfully.', 'success');
 
     return newCand;
   };
@@ -695,10 +685,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setAuditLogs(prev => [log, ...prev]);
 
-    // AUTO-EXPORT JOB OPENING TO EXCEL
-    exportJobToExcel(newJob);
-
-    showToast('Job opening published & saved to Excel (.xlsx)!', 'success');
+    showToast('Job opening published successfully.', 'success');
     return newJob;
   };
 
@@ -774,10 +761,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. SAVE APPLICATION TO SUPABASE DATABASE
     saveApplicationToSupabase(newApp);
 
-    // 2. SAVE APPLICATION TO EXCEL SPREADSHEET (.xlsx)
-    exportApplicationToExcel(newApp);
-
-    showToast(`Application submitted, saved to Supabase & Excel (.xlsx)!`, 'success');
+    showToast('Application submitted and saved to Supabase successfully.', 'success');
 
     return newApp;
   };
@@ -863,10 +847,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. SAVE ENQUIRY TO SUPABASE DATABASE
     saveEnquiryToSupabase(newEnq);
 
-    // 2. SAVE ENQUIRY TO EXCEL SPREADSHEET (.xlsx)
-    exportEnquiryToExcel(newEnq);
-
-    showToast(`Enquiry submitted, saved to Supabase & Excel (.xlsx)!`, 'success');
+    showToast('Enquiry submitted and saved to Supabase successfully.', 'success');
 
     return newEnq;
   };
@@ -907,10 +888,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. SAVE CONTACT MESSAGE TO SUPABASE
     saveContactToSupabase(newMsg);
 
-    // 2. SAVE CONTACT MESSAGE TO EXCEL (.xlsx)
-    exportContactToExcel(newMsg);
-
-    showToast('Message sent, saved to Supabase & Excel (.xlsx)!', 'success');
+    showToast('Message sent and saved to Supabase successfully.', 'success');
 
     return newMsg;
   };

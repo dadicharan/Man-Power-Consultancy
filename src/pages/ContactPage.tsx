@@ -171,30 +171,6 @@ export const ContactPage: React.FC = () => {
                     Thank you, {fullName}. Our recruitment communications team will review your inquiry and respond within 24 hours.
                   </p>
                   
-                  <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const contactObj = {
-                          id: `msg-${Date.now()}`,
-                          name: fullName,
-                          email,
-                          phone,
-                          subject,
-                          message,
-                          status: 'Unread' as const,
-                          createdAt: new Date().toLocaleDateString('en-GB')
-                        };
-                        import('../lib/excelExport').then(m => m.exportContactToExcel(contactObj));
-                        showToast('Contact message exported to Excel (.xlsx)!', 'success');
-                      }}
-                      className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow flex items-center gap-1.5"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Download Excel Sheet (.xlsx)</span>
-                    </button>
-                  </div>
-
                   <div className="pt-2">
                     <button
                       onClick={handleReset}

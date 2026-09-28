@@ -135,34 +135,6 @@ export const EmployerEnquiryPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const enqObj = {
-                      id: submittedEnquiryId || 'enq-ref',
-                      companyName,
-                      contactPerson,
-                      designation: designation || 'Manager',
-                      email,
-                      phone,
-                      companyLocation: companyLocation || 'Bangalore',
-                      jobTitle,
-                      vacancies: Number(vacancies),
-                      additionalRequirements,
-                      status: 'New' as const,
-                      createdAt: new Date().toLocaleDateString('en-GB')
-                    };
-                    import('../lib/excelExport').then(m => m.exportEnquiryToExcel(enqObj));
-                    showToast('Enquiry exported to Excel (.xlsx)!', 'success');
-                  }}
-                  className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow flex items-center gap-1.5"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Download Excel Sheet (.xlsx)</span>
-                </button>
-              </div>
-
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/admin"

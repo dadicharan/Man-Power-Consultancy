@@ -185,7 +185,6 @@ Man-Power-Consultancy/
 │   ├── data/
 │   │   └── seedData.ts
 │   ├── lib/
-│   │   ├── excelExport.ts
 │   │   └── supabase.ts
 │   ├── pages/
 │   │   ├── AboutPage.tsx

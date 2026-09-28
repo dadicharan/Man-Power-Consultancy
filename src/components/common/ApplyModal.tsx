@@ -172,37 +172,6 @@ export const ApplyModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const appObj = {
-                      id: submittedAppId || 'app-ref',
-                      candidateId: 'cand-ref',
-                      candidateName: fullName,
-                      candidateEmail: email,
-                      candidatePhone: phone,
-                      jobId: applyJobModal.id,
-                      jobTitle: applyJobModal.title,
-                      company: applyJobModal.company,
-                      location: applyJobModal.location,
-                      appliedDate: new Date().toLocaleDateString('en-GB'),
-                      status: 'Applied' as const,
-                      currentStage: 'Applied' as const,
-                      resumeFileName: resumeFileName,
-                      coverLetter,
-                      updatedAt: new Date().toLocaleDateString('en-GB')
-                    };
-                    import('../../lib/excelExport').then(m => m.exportApplicationToExcel(appObj));
-                    showToast('Application exported to Excel (.xlsx)!', 'success');
-                  }}
-                  className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow flex items-center gap-1.5"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Download Excel (.xlsx)</span>
-                </button>
-              </div>
-
               <div className="pt-2">
                 <button
                   onClick={handleClose}
