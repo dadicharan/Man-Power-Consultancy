@@ -25,6 +25,23 @@ export function isSupabaseConfigured(): boolean {
   return !!(supabaseUrl && supabaseAnonKey && supabaseUrl.startsWith('https://'));
 }
 
+export async function getCurrentSupabaseUser(): Promise<UserProfile | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !user.email) return null;
+
+  return {
+    id: user.id,
+    name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+    email: user.email,
+    phone: user.user_metadata?.phone || '',
+    role: 'candidate',
+    avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.picture
+  };
+}
+
 /**
  * Save / Upsert user profile in Supabase 'users' table
  */
@@ -209,7 +226,7 @@ export async function saveContactToSupabase(contact: ContactMessage): Promise<{ 
 
 /**
  * Google Sign In helper
- * Initiates Supabase OAuth if configured, or performs browser Google profile emulation
+ * Initiates Supabase OAuth. A real Supabase Google provider is required.
  */
 export async function initiateGoogleSignIn(): Promise<{
   success: boolean;
@@ -232,21 +249,8 @@ export async function initiateGoogleSignIn(): Promise<{
     }
   }
 
-  // Universal Google Sign-In Simulation with persistent Supabase/local profile
-  // Generates real verified profile data based on Google Identity format
-  const googleUser: UserProfile = {
-    id: `goog_${Date.now()}`,
-    name: 'Google User',
-    email: 'user.google@gmail.com',
-    phone: '+91 98765 43210',
-    role: 'candidate',
-    avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80'
-  };
-
-  await saveUserToSupabase(googleUser);
-
   return {
-    success: true,
-    user: googleUser
+    success: false,
+    error: 'Google login is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then enable Google in Supabase Authentication providers.'
   };
 }

@@ -14,7 +14,8 @@ import {
   ArrowUpRight,
   ShieldCheck,
   ChevronDown,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -42,6 +43,8 @@ export const AdminDashboardPage: React.FC = () => {
     candidates, 
     applications, 
     enquiries, 
+    contactMessages,
+    registeredUsers,
     auditLogs, 
     updateApplicationStage, 
     updateEnquiryStatus, 
@@ -56,7 +59,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [adminPass, setAdminPass] = useState('Admin@123');
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'candidates' | 'applications' | 'enquiries' | 'audit'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'candidates' | 'applications' | 'enquiries' | 'users' | 'contacts' | 'audit'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
 
@@ -306,6 +309,8 @@ export const AdminDashboardPage: React.FC = () => {
             { key: 'candidates', label: `Candidates (${candidates.length})`, icon: Users },
             { key: 'applications', label: `Applications (${applications.length})`, icon: FileText },
             { key: 'enquiries', label: `Enquiries (${enquiries.length})`, icon: Building2 },
+            { key: 'users', label: `User Accounts (${registeredUsers.length})`, icon: Users },
+            { key: 'contacts', label: `Messages (${contactMessages.length})`, icon: MessageSquare },
             { key: 'audit', label: 'Audit Trail', icon: Clock },
           ].map(tab => {
             const Icon = tab.icon;
@@ -654,6 +659,60 @@ export const AdminDashboardPage: React.FC = () => {
                           {c.resumeFileName || 'View CV'}
                         </span>
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'users' && (
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mt-6">
+            <div className="p-5 border-b border-slate-100">
+              <h3 className="text-base font-bold text-slate-900">Registered User Accounts ({registeredUsers.length})</h3>
+              <p className="text-xs text-slate-500">Accounts created through email registration and Google sign-in.</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-700">
+                <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                  <tr><th className="px-5 py-3">Name</th><th className="px-5 py-3">Email</th><th className="px-5 py-3">Phone</th><th className="px-5 py-3">Role</th><th className="px-5 py-3">Provider</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {registeredUsers.map(user => (
+                    <tr key={user.id} className="hover:bg-slate-50/80">
+                      <td className="px-5 py-3.5 font-bold text-slate-900">{user.name}</td>
+                      <td className="px-5 py-3.5">{user.email}</td>
+                      <td className="px-5 py-3.5 text-slate-500">{user.phone || 'Not provided'}</td>
+                      <td className="px-5 py-3.5 capitalize">{user.role}</td>
+                      <td className="px-5 py-3.5 capitalize">{user.authProvider}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'contacts' && (
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mt-6">
+            <div className="p-5 border-b border-slate-100">
+              <h3 className="text-base font-bold text-slate-900">Contact Messages ({contactMessages.length})</h3>
+              <p className="text-xs text-slate-500">Messages submitted through the public contact form.</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-700">
+                <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                  <tr><th className="px-5 py-3">Sender</th><th className="px-5 py-3">Subject</th><th className="px-5 py-3">Message</th><th className="px-5 py-3">Date</th><th className="px-5 py-3">Status</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {contactMessages.map(contact => (
+                    <tr key={contact.id} className="hover:bg-slate-50/80 align-top">
+                      <td className="px-5 py-3.5"><div className="font-bold text-slate-900">{contact.name}</div><div className="text-slate-500">{contact.email}</div><div className="text-slate-400">{contact.phone}</div></td>
+                      <td className="px-5 py-3.5 font-semibold">{contact.subject}</td>
+                      <td className="px-5 py-3.5 max-w-md text-slate-600">{contact.message}</td>
+                      <td className="px-5 py-3.5 text-slate-500">{contact.createdAt}</td>
+                      <td className="px-5 py-3.5"><span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">{contact.status}</span></td>
                     </tr>
                   ))}
                 </tbody>

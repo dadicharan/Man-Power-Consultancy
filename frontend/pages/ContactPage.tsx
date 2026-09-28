@@ -16,7 +16,7 @@ import { Breadcrumb } from '../components/common/Breadcrumb';
 import { useApp } from '../context/AppContext';
 
 export const ContactPage: React.FC = () => {
-  const { showToast } = useApp();
+  const { showToast, submitContactMessage } = useApp();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -39,6 +39,13 @@ export const ContactPage: React.FC = () => {
     setErrorMsg(null);
 
     setTimeout(() => {
+      submitContactMessage({
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        subject,
+        message: message.trim()
+      });
       setIsSubmitting(false);
       setIsSent(true);
       showToast('Thank you! Your message has been sent to our consulting desk.', 'success');

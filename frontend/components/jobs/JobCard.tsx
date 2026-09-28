@@ -19,7 +19,7 @@ interface JobCardProps {
 }
 
 export const JobCard: React.FC<JobCardProps> = ({ job, compact = false }) => {
-  const { setApplyJobModal, toggleSaveJob, isJobSaved } = useApp();
+  const { setApplyJobModal, toggleSaveJob, isJobSaved, hasAppliedForJob, showToast } = useApp();
   const saved = isJobSaved(job.id);
 
   // Pick category icon background color
@@ -145,7 +145,13 @@ export const JobCard: React.FC<JobCardProps> = ({ job, compact = false }) => {
             Details <ArrowUpRight className="w-3 h-3" />
           </Link>
           <button
-            onClick={() => setApplyJobModal(job)}
+            onClick={() => {
+              if (hasAppliedForJob(job.id)) {
+                showToast('You have already applied for this job.', 'info');
+                return;
+              }
+              setApplyJobModal(job);
+            }}
             className="px-4 py-1.5 rounded-md text-xs font-bold bg-[#FF6B00] hover:bg-[#E05E00] text-white shadow-sm hover:shadow transition-all active:scale-95"
           >
             Apply Now

@@ -33,10 +33,10 @@ import {
   saveEnquiryToSupabase, 
   saveContactToSupabase, 
   initiateGoogleSignIn,
+  getCurrentSupabaseUser,
   isSupabaseConfigured
 } from '../lib/supabase';
 import { 
-  exportApplicationToExcel, 
   exportCandidateToExcel, 
   exportEnquiryToExcel, 
   exportContactToExcel, 
@@ -54,6 +54,8 @@ interface RegisteredAccount {
   password?: string;
   authProvider: 'email' | 'google' | 'admin';
 }
+
+export type RegisteredUser = Omit<RegisteredAccount, 'password'>;
 
 interface AppContextType {
   // Roles & Auth
@@ -83,6 +85,7 @@ interface AppContextType {
   applications: Application[];
   enquiries: EmployerEnquiry[];
   contactMessages: ContactMessage[];
+  registeredUsers: RegisteredUser[];
   services: ServiceItem[];
   testimonials: Testimonial[];
   notifications: AppNotification[];
@@ -105,6 +108,7 @@ interface AppContextType {
     resumeFileName?: string;
     coverLetter?: string;
   }) => Application;
+  hasAppliedForJob: (jobId: string, email?: string) => boolean;
   updateApplicationStage: (id: string, newStage: ApplicationStage, notes?: string) => void;
 
   submitEmployerEnquiry: (enquiry: Omit<EmployerEnquiry, 'id' | 'createdAt' | 'status'>) => EmployerEnquiry;
@@ -348,6 +352,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => saveToStorage('audit_logs', auditLogs), [auditLogs]);
   useEffect(() => saveToStorage('saved_job_ids', savedJobIds), [savedJobIds]);
 
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+    const syncSupabaseUser = (profile: UserProfile | null) => {
+      if (!profile) return;
+      setCurrentRoleState(profile.role);
+      setCurrentUser(profile);
+      setNotifications(getUserNotifications(profile.role, profile.name));
+      setRegisteredAccounts(prev => {
+        const existing = prev.find(account => account.id === profile.id || account.email.toLowerCase() === profile.email.toLowerCase());
+        const account: RegisteredAccount = {
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phone,
+          role: profile.role,
+          authProvider: 'google'
+        };
+        return existing
+          ? prev.map(item => item.id === existing.id ? { ...item, ...account } : item)
+          : [account, ...prev];
+      });
+      saveUserToSupabase(profile);
+    };
+
+    getCurrentSupabaseUser().then(syncSupabaseUser);
+    return () => unsubscribe?.();
+  }, []);
+
   const setCurrentRole = (role: UserRole) => {
     setCurrentRoleState(role);
     if (role === 'admin') {
@@ -571,7 +603,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           role: result.user.role,
           authProvider: 'google'
         };
-        setRegisteredAccounts(prev => [gAcc, ...prev]);
+        setRegisteredAccounts(prev => {
+          const existing = prev.find(acc => acc.email.toLowerCase() === gAcc.email.toLowerCase());
+          return existing
+            ? prev.map(acc => acc.email.toLowerCase() === gAcc.email.toLowerCase() ? { ...acc, ...gAcc } : acc)
+            : [gAcc, ...prev];
+        });
 
         showToast(`Signed in with Google as ${result.user.name}! Saved to Supabase.`, 'success');
         return { success: true };
@@ -617,6 +654,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // =========================================================================
   // DATA OPERATIONS WITH AUTOMATIC SUPABASE PERSISTENCE & EXCEL SHEET DOWNLOAD
   // =========================================================================
+
+  const hasAppliedForJob = (jobId: string, email = currentUser.email): boolean => {
+    const cleanEmail = email.trim().toLowerCase();
+    return Boolean(cleanEmail) && applications.some(app =>
+      app.jobId === jobId && app.candidateEmail.trim().toLowerCase() === cleanEmail
+    );
+  };
 
   // Candidates CRUD
   const addCandidate = (candidateData: Omit<Candidate, 'id' | 'registeredDate' | 'status' | 'profileCompletion'>): Candidate => {
@@ -720,6 +764,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     resumeFileName?: string;
     coverLetter?: string;
   }): Application => {
+    if (hasAppliedForJob(jobId, candidateDetails.email)) {
+      throw new Error('You have already applied for this job. Each candidate can apply once per job.');
+    }
+
     const job = jobs.find(j => j.id === jobId);
     const existingCand = candidates.find(c => c.email.toLowerCase() === candidateDetails.email.toLowerCase());
 
@@ -774,10 +822,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. SAVE APPLICATION TO SUPABASE DATABASE
     saveApplicationToSupabase(newApp);
 
-    // 2. SAVE APPLICATION TO EXCEL SPREADSHEET (.xlsx)
-    exportApplicationToExcel(newApp);
-
-    showToast(`Application submitted, saved to Supabase & Excel (.xlsx)!`, 'success');
+    showToast('Application submitted successfully and sent to the admin dashboard.', 'success');
 
     return newApp;
   };
@@ -975,6 +1020,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       jobs,
       employers,
       applications,
+      registeredUsers: registeredAccounts.map(({ password: _password, ...account }) => account),
       enquiries,
       contactMessages,
       services,
@@ -989,6 +1035,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateJob,
       deleteJob,
       applyForJob,
+      hasAppliedForJob,
       updateApplicationStage,
       submitEmployerEnquiry,
       updateEnquiryStatus,

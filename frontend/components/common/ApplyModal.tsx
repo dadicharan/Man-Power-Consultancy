@@ -13,14 +13,14 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
 
 export const ApplyModal: React.FC = () => {
-  const { applyJobModal, setApplyJobModal, applyForJob, currentUser, showToast } = useApp();
+  const { applyJobModal, setApplyJobModal, applyForJob, hasAppliedForJob, currentUser, showToast } = useApp();
 
   const [fullName, setFullName] = useState(currentUser.role === 'candidate' ? currentUser.name : '');
   const [email, setEmail] = useState(currentUser.role === 'candidate' ? currentUser.email : '');
   const [phone, setPhone] = useState(currentUser.phone || '');
   const [coverLetter, setCoverLetter] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [resumeFileName, setResumeFileName] = useState<string>('Standard_Resume.pdf');
+  const [resumeFileName, setResumeFileName] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAppId, setSubmittedAppId] = useState<string | null>(null);
@@ -65,16 +65,25 @@ export const ApplyModal: React.FC = () => {
       setErrorMsg('Please complete your name, email, and phone number.');
       return;
     }
+    if (!resumeFile) {
+      setErrorMsg('Please choose your resume before submitting.');
+      return;
+    }
+    if (hasAppliedForJob(applyJobModal.id, email)) {
+      setErrorMsg('You have already applied for this job. Each candidate can apply once per job.');
+      return;
+    }
 
     setIsSubmitting(true);
     setTimeout(() => {
-      const newApp = applyForJob(applyJobModal.id, {
-        fullName: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        resumeFileName: resumeFileName,
-        coverLetter: coverLetter.trim()
-      });
+      try {
+        const newApp = applyForJob(applyJobModal.id, {
+          fullName: fullName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          resumeFileName,
+          coverLetter: coverLetter.trim()
+        });
 
       // Confetti celebration
       try {
@@ -87,9 +96,14 @@ export const ApplyModal: React.FC = () => {
         // ignore if canvas unavailable
       }
 
-      setIsSubmitting(false);
-      setSubmittedAppId(newApp.id);
-      showToast(`Application submitted for ${applyJobModal.title}!`, 'success');
+        setIsSubmitting(false);
+        setSubmittedAppId(newApp.id);
+        showToast(`Application submitted for ${applyJobModal.title}!`, 'success');
+        window.setTimeout(handleClose, 3000);
+      } catch (error) {
+        setIsSubmitting(false);
+        setErrorMsg(error instanceof Error ? error.message : 'Unable to submit application.');
+      }
     }, 600);
   };
 
@@ -97,6 +111,9 @@ export const ApplyModal: React.FC = () => {
     setApplyJobModal(null);
     setSubmittedAppId(null);
     setErrorMsg(null);
+    setResumeFile(null);
+    setResumeFileName('');
+    setCoverLetter('');
   };
 
   return (
@@ -172,37 +189,6 @@ export const ApplyModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const appObj = {
-                      id: submittedAppId || 'app-ref',
-                      candidateId: 'cand-ref',
-                      candidateName: fullName,
-                      candidateEmail: email,
-                      candidatePhone: phone,
-                      jobId: applyJobModal.id,
-                      jobTitle: applyJobModal.title,
-                      company: applyJobModal.company,
-                      location: applyJobModal.location,
-                      appliedDate: new Date().toLocaleDateString('en-GB'),
-                      status: 'Applied' as const,
-                      currentStage: 'Applied' as const,
-                      resumeFileName: resumeFileName,
-                      coverLetter,
-                      updatedAt: new Date().toLocaleDateString('en-GB')
-                    };
-                    import('../../lib/excelExport').then(m => m.exportApplicationToExcel(appObj));
-                    showToast('Application exported to Excel (.xlsx)!', 'success');
-                  }}
-                  className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow flex items-center gap-1.5"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Download Excel (.xlsx)</span>
-                </button>
-              </div>
-
               <div className="pt-2">
                 <button
                   onClick={handleClose}
@@ -273,7 +259,7 @@ export const ApplyModal: React.FC = () => {
                   onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={handleFileDrop}
-                  className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors ${
+                  className={`relative border-2 border-dashed rounded-xl p-4 text-center transition-colors ${
                     isDragging ? 'border-[#FF6B00] bg-orange-50/40' : 'border-slate-300 hover:border-slate-400 bg-slate-50'
                   }`}
                 >
@@ -286,11 +272,12 @@ export const ApplyModal: React.FC = () => {
                   <input 
                     type="file" 
                     accept=".pdf,.doc,.docx" 
+                    required
                     onChange={handleFileInput}
                     className="hidden" 
                     id="resume-file-input"
                   />
-                  <label htmlFor="resume-file-input" className="absolute inset-0 cursor-pointer"></label>
+                  <label htmlFor="resume-file-input" className="absolute inset-0 cursor-pointer" aria-label="Choose resume file"></label>
                 </div>
 
                 {resumeFileName && (
